@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Search</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    :root{--bg:#0b1324;--card:#0f1b33;--text:#e9eef9;--muted:#93c5fd;--line:#1f2a44;--brand:#3b82f6}
+    body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto;margin:0}
+    .wrap{max-width:900px;margin:32px auto;background:var(--card);padding:22px;border-radius:16px}
+    h1{margin:0 0 16px}
+    a{color:var(--muted);text-decoration:none}
+    .video{width:100%;background:#000;border-radius:10px;margin:10px 0}
+    .row{display:flex;gap:8px;align-items:center}
+    input[type=text],button{padding:10px 12px;border:0;border-radius:8px}
+    button{background:var(--brand);color:#fff;cursor:pointer}
+    table{width:100%;border-collapse:collapse;margin-top:14px}
+    th,td{padding:10px;border-bottom:1px solid var(--line)}
+    th{text-align:left;opacity:.9}
+    colgroup col:nth-child(1){width:64px}
+    colgroup col:nth-child(3){width:120px}
+    .muted{opacity:.8}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🔎 Search</h1>
+
+    <p><a href="/">↩ Upload another video</a></p>
+
+    <video id="player" class="video" controls src="{{ video_url }}"></video>
+
+    <form action="/search/{{ job_id }}" method="post" class="row" style="margin:10px 0">
+      <input type="text" name="q" value="{{ query or '' }}" placeholder="e.g., person, glasses, laptop, 'I HATE CODE'">
+      <button type="submit">Search</button>
+    </form>
+
+    <div>
+      <p class="muted">Results for “{{ query or '' }}” — {{ count or 0 }} hits</p>
+      <table>
+        <colgroup><col><col><col></colgroup>
+        <thead>
+          <tr><th>#</th><th>Hyperlink</th><th>Time Stamp</th></tr>
+        </thead>
+        <tbody id="rows">
+        {% if items %}
+          {% for it in items %}
+            <tr>
+              <td>{{ it.index }}</td>
+              <td><a href="#" class="jump" data-t="{{ '%.2f'|format(it.t) }}">Open at {{ it.mmss }}</a></td>
+              <td>{{ it.mmss }}</td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="3" class="muted">No results</td></tr>
+        {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // same-tab, same-video jumps
+    const v = document.getElementById('player');
+    document.querySelectorAll('.jump').forEach(a=>{
+      a.addEventListener('click', (e)=>{
+        e.preventDefault();
+        const t = parseFloat(a.dataset.t||'0');
+        if (!isNaN(t)){ v.currentTime = t; v.play(); window.scrollTo({top:0,behavior:'smooth'}); }
+      });
+    });
+  </script>
+</body>
+</html>

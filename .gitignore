@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+jobs/
+.hfcache/
+.eocache/
+.DS_Store
